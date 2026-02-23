@@ -10,6 +10,3 @@ echo "install spatial; load spatial; install h3 from community; load h3;" >> ~/.
 # use duckdb to make (geo)parquet files
 duckdb < data_40.sql
 duckdb < data_50.sql
-
-# write query that returns a vector tile for a given x/y/z
-# tile.sql
