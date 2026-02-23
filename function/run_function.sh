@@ -46,15 +46,15 @@ az functionapp create \
     --name azduckmvtfunction \
     --storage-account azduckmvtstorage \
     --resource-group azduckmvt \
-    --consumption-plan-location eastus2 \
+    --flexconsumption-location eastus2\
     --runtime python \
     --runtime-version 3.12 \
     --functions-version 4 \
     --os-type Linux
 
-func azure functionapp publish azduckmvtfunction
-
 az functionapp config appsettings set \
   --name azduckmvtfunction \
   --resource-group azduckmvt \
   --settings "AZURE_STORAGE_CONNECTION_STRING=${AZURE_STORAGE_CONNECTION_STRING}"
+
+func azure functionapp publish azduckmvtfunction
