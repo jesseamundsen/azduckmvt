@@ -1,17 +1,26 @@
 #!/bin/bash
 
-# need azure functions core tools: https://learn.microsoft.com/en-us/azure/azure-functions/functions-run-local
-func init . --worker-runtime python
-#func new --template "Http Trigger" --name MyHttpTrigger
-python3 -m venv .venv
-pip install -r requirements.txt
 
-# statically grab extensions steps go here (dl using wget, extract, place into extensions dir)
+
+# requirement azure functions core tools: https://learn.microsoft.com/en-us/azure/azure-functions/functions-run-local
+# requirement azure cli: https://learn.microsoft.com/en-us/cli/azure/
+
+
+
+# initial function setup
+# func init . --worker-runtime python
+# python3 -m venv .venv
+# pip install -r requirements.txt
+
+
+
+# install extensions locally
 curl -L http://extensions.duckdb.org/v1.4.4/linux_amd64/azure.duckdb_extension.gz | gunzip -c > extensions/v1.4.4/linux_amd64/azure.duckdb_extension
 curl -L http://extensions.duckdb.org/v1.4.4/linux_amd64/spatial.duckdb_extension.gz | gunzip -c > extensions/v1.4.4/linux_amd64/spatial.duckdb_extension
 
-# for azure cli tools: curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
+
+# azure resources setup
 az login
 
 az group delete --name azduckmvt
