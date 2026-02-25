@@ -21,16 +21,30 @@
             z-index: 1;
         }
         select { font-size: 14px; padding: 4px; }
+        .legend {
+            position: absolute; bottom: 30px; right: 10px; background: white; padding: 10px;
+            border-radius: 4px; box-shadow: 0 0 0 2px rgba(0,0,0,0.1); font-family: sans-serif; z-index: 1;
+        }
+        .legend h4 { margin: 0 0 5px; font-size: 14px; }
+        .legend div { display: flex; align-items: center; margin-bottom: 2px; font-size: 12px; }
+        .legend span { display: inline-block; width: 20px; height: 20px; margin-right: 5px; border: 1px solid #ccc; }
     </style>
 </head>
 <body>
     <div class="control-panel">
         <label for="technology">Technology:</label>
         <select id="technology">
+            <option value="10">Technology 10</option>
             <option value="40">Technology 40</option>
             <option value="50">Technology 50</option>
+            <option value="60">Technology 60</option>
+            <option value="61">Technology 61</option>
+            <option value="70">Technology 70</option>
+            <option value="71">Technology 71</option>
+            <option value="72">Technology 72</option>
         </select>
     </div>
+    <div id="legend" class="legend"></div>
     <div id="map"></div>
 
     <script>
@@ -59,6 +73,26 @@
             zoom: 4
         });
 
+        const getRandomColor = () => {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        };
+
+        const techNames = {
+            10: "Copper Wire",
+            40: "Coaxial Cable",
+            50: "Optical Carrier/Fiber",
+            60: "Geostationary Satellite",
+            61: "Non-geostationary Satellite",
+            70: "Unlicensed Fixed Wireless",
+            71: "Licensed Fixed Wireless",
+            72: "Licensed-by-Rule Fixed Wireless"
+        };
+
         const updateLayer = (technology) => {
             const sourceId = 'mvt-source';
             const layerId = 'mvt-layer';
@@ -68,29 +102,22 @@
             if (map.getLayer(layerId)) map.removeLayer(layerId);
             if (map.getSource(sourceId)) map.removeSource(sourceId);
 
-            const blueRamp = [
+            const stops = [1, 10, 50, 100, 500];
+            const colors = stops.map(() => getRandomColor());
+
+            const randomRamp = [
                 'interpolate',
                 ['linear'],
                 ['get', 'locations'],
-                0, 'rgba(255,255,255,0)',
-                1, '#eff3ff',
-                10, '#bdd7e7',
-                50, '#6baed6',
-                100, '#3182bd',
-                500, '#08519c'
+                0, 'rgba(255,255,255,0)'
             ];
 
-            const greenRamp = [
-                'interpolate',
-                ['linear'],
-                ['get', 'locations'],
-                0, 'rgba(255,255,255,0)',
-                1, '#edf8e9',
-                10, '#bae4b3',
-                50, '#74c476',
-                100, '#31a354',
-                500, '#006d2c'
-            ];
+            let legendHtml = `<h4>${techNames[technology] || 'Technology ' + technology}</h4>`;
+            stops.forEach((stop, i) => {
+                randomRamp.push(stop, colors[i]);
+                legendHtml += `<div><span style="background-color: ${colors[i]}"></span>${stop} Locations</div>`;
+            });
+            document.getElementById('legend').innerHTML = legendHtml;
 
             map.addSource(sourceId, {
                 type: 'vector',
@@ -105,7 +132,7 @@
                 'source': sourceId,
                 'source-layer': 'default',
                 'paint': {
-                    'fill-color': technology === '40' ? blueRamp : greenRamp,
+                    'fill-color': randomRamp,
                     'fill-opacity': 0.7,
                     'fill-outline-color': 'rgba(0,0,0,0.1)'
                 }
