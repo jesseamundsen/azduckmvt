@@ -27,6 +27,7 @@ def tiles(req: func.HttpRequest) -> func.HttpResponse:
         return func.HttpResponse(status_code=400)
     sql = """
         select st_asmvt({
+                "h3_8": d.h3_8
                 "locations": d.locations
                 ,"providers": d.providers
                 ,"geometry": st_asmvtgeom(d.geom,st_extent(e.geom))
