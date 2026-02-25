@@ -39,14 +39,14 @@
     <div class="control-panel">
         <label for="technology">Technology:</label>
         <select id="technology">
-            <option value="10">Technology 10</option>
-            <option value="40">Technology 40</option>
-            <option value="50">Technology 50</option>
-            <option value="60">Technology 60</option>
-            <option value="61">Technology 61</option>
-            <option value="70">Technology 70</option>
-            <option value="71">Technology 71</option>
-            <option value="72">Technology 72</option>
+            <option value="10">Copper Wire</option>
+            <option value="40">Coaxial Cable</option>
+            <option value="50">Optical Carrier/Fiber</option>
+            <option value="60">Geostationary Satellite</option>
+            <option value="61">Non-geostationary Satellite</option>
+            <option value="70">Unlicensed Fixed Wireless</option>
+            <option value="71">Licensed Fixed Wireless</option>
+            <option value="72">Licensed-by-Rule Fixed Wireless</option>
         </select>
     </div>
     <div id="legend" class="legend"></div>
@@ -90,17 +90,6 @@
             return color;
         };
 
-        const techNames = {
-            10: "Copper Wire",
-            40: "Coaxial Cable",
-            50: "Optical Carrier/Fiber",
-            60: "Geostationary Satellite",
-            61: "Non-geostationary Satellite",
-            70: "Unlicensed Fixed Wireless",
-            71: "Licensed Fixed Wireless",
-            72: "Licensed-by-Rule Fixed Wireless"
-        };
-
         const updateLayer = (technology) => {
             const sourceId = 'mvt-source';
             const layerId = 'mvt-layer';
@@ -120,7 +109,7 @@
                 0, 'rgba(255,255,255,0)'
             ];
 
-            let legendHtml = `<h4>${techNames[technology] || 'Technology ' + technology}</h4>`;
+            let legendHtml = `<h4>Legend</h4>`;
             stops.forEach((stop, i) => {
                 randomRamp.push(stop, colors[i]);
                 legendHtml += `<div><span style="background-color: ${colors[i]}"></span>${stop} Locations</div>`;
