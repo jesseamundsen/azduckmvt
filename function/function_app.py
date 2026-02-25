@@ -27,9 +27,11 @@ def tiles(req: func.HttpRequest) -> func.HttpResponse:
         return func.HttpResponse(status_code=400)
     sql = """
         select st_asmvt({
-                "h3_8": d.h3_8
-                "locations": d.locations
+                 "h3_res8_id": d.h3_res8_id
+                ,"technology": d.technology
+                ,"locations": d.locations
                 ,"providers": d.providers
+                ,"maxdown": d.maxdown
                 ,"geometry": st_asmvtgeom(d.geom,st_extent(e.geom))
             },'default') mvt
         from 'az://azduckmvtcontainer/data_*.parquet' d
