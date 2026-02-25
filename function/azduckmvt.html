@@ -28,6 +28,11 @@
         .legend h4 { margin: 0 0 5px; font-size: 14px; }
         .legend div { display: flex; align-items: center; margin-bottom: 2px; font-size: 12px; }
         .legend span { display: inline-block; width: 20px; height: 20px; margin-right: 5px; border: 1px solid #ccc; }
+        .github-link {
+            position: absolute; bottom: 10px; left: 10px; background: white; padding: 5px;
+            border-radius: 4px; box-shadow: 0 0 0 2px rgba(0,0,0,0.1); font-family: sans-serif; z-index: 1; font-size: 12px;
+        }
+        .github-link a { text-decoration: none; color: #333; }
     </style>
 </head>
 <body>
@@ -45,6 +50,9 @@
         </select>
     </div>
     <div id="legend" class="legend"></div>
+    <div class="github-link">
+        <a href="https://github.com/jesseamundsen/azduckmvt/" target="_blank">View on GitHub</a>
+    </div>
     <div id="map"></div>
 
     <script>
