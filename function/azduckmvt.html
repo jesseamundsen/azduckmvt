@@ -62,12 +62,35 @@
         const updateLayer = (technology) => {
             const sourceId = 'mvt-source';
             const layerId = 'mvt-layer';
-            //const tileUrl = `http://localhost:7071/api/tiles/${technology}/{z}/{x}/{y}`;
             const tileUrl = `https://azduckmvtfunction.azurewebsites.net/api/tiles/${technology}/{z}/{x}/{y}`;
 
             // Remove existing layer and source if they exist
             if (map.getLayer(layerId)) map.removeLayer(layerId);
             if (map.getSource(sourceId)) map.removeSource(sourceId);
+
+            const blueRamp = [
+                'interpolate',
+                ['linear'],
+                ['get', 'locations'],
+                0, 'rgba(255,255,255,0)',
+                1, '#eff3ff',
+                10, '#bdd7e7',
+                50, '#6baed6',
+                100, '#3182bd',
+                500, '#08519c'
+            ];
+
+            const greenRamp = [
+                'interpolate',
+                ['linear'],
+                ['get', 'locations'],
+                0, 'rgba(255,255,255,0)',
+                1, '#edf8e9',
+                10, '#bae4b3',
+                50, '#74c476',
+                100, '#31a354',
+                500, '#006d2c'
+            ];
 
             map.addSource(sourceId, {
                 type: 'vector',
@@ -80,19 +103,9 @@
                 'id': layerId,
                 'type': 'fill',
                 'source': sourceId,
-                'source-layer': 'default', // DuckDB ST_AsMVT defaults to 'default' if not specified
+                'source-layer': 'default',
                 'paint': {
-                    'fill-color': [
-                        'interpolate',
-                        ['linear'],
-                        ['get', 'locations'],
-                        0, 'rgba(255,255,255,0)', // Transparent for 0
-                        1, '#fee5d9',
-                        10, '#fcae91',
-                        50, '#fb6a4a',
-                        100, '#de2d26',
-                        500, '#a50f15'
-                    ],
+                    'fill-color': technology === '40' ? blueRamp : greenRamp,
                     'fill-opacity': 0.7,
                     'fill-outline-color': 'rgba(0,0,0,0.1)'
                 }
@@ -100,6 +113,28 @@
         };
 
         map.on('load', () => {
+            map.on('click', 'mvt-layer', (e) => {
+                const props = e.features[0].properties;
+                let content = '<div style="font-family: sans-serif; font-size: 12px;">';
+                for (const key in props) {
+                    content += `<strong>${key}:</strong> ${props[key]}<br/>`;
+                }
+                content += '</div>';
+
+                new maplibregl.Popup()
+                    .setLngLat(e.lngLat)
+                    .setHTML(content)
+                    .addTo(map);
+            });
+
+            map.on('mouseenter', 'mvt-layer', () => {
+                map.getCanvas().style.cursor = 'pointer';
+            });
+
+            map.on('mouseleave', 'mvt-layer', () => {
+                map.getCanvas().style.cursor = '';
+            });
+
             const select = document.getElementById('technology');
             
             // Initialize
