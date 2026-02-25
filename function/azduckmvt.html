@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AzDuckMVT Client</title>
+    <script src="https://unpkg.com/maplibre-gl@4.0.0/dist/maplibre-gl.js"></script>
+    <link href="https://unpkg.com/maplibre-gl@4.0.0/dist/maplibre-gl.css" rel="stylesheet" />
+    <style>
+        body { margin: 0; padding: 0; }
+        #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+        .control-panel {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: white;
+            padding: 10px;
+            border-radius: 4px;
+            box-shadow: 0 0 0 2px rgba(0,0,0,0.1);
+            font-family: sans-serif;
+            z-index: 1;
+        }
+        select { font-size: 14px; padding: 4px; }
+    </style>
+</head>
+<body>
+    <div class="control-panel">
+        <label for="technology">Technology:</label>
+        <select id="technology">
+            <option value="40">Technology 40</option>
+            <option value="50">Technology 50</option>
+        </select>
+    </div>
+    <div id="map"></div>
+
+    <script>
+        const map = new maplibregl.Map({
+            container: 'map',
+            style: {
+                'version': 8,
+                'sources': {
+                    'osm': {
+                        'type': 'raster',
+                        'tiles': ['https://a.tile.openstreetmap.org/{z}/{x}/{y}.png'],
+                        'tileSize': 256,
+                        'attribution': '&copy; OpenStreetMap Contributors',
+                        'maxzoom': 19
+                    }
+                },
+                'layers': [
+                    {
+                        'id': 'osm',
+                        'type': 'raster',
+                        'source': 'osm'
+                    }
+                ]
+            },
+            center: [-98.5795, 39.8283], // Center of USA
+            zoom: 4
+        });
+
+        const updateLayer = (technology) => {
+            const sourceId = 'mvt-source';
+            const layerId = 'mvt-layer';
+            const tileUrl = `http://localhost:7071/api/tiles/${technology}/{z}/{x}/{y}`;
+
+            // Remove existing layer and source if they exist
+            if (map.getLayer(layerId)) map.removeLayer(layerId);
+            if (map.getSource(sourceId)) map.removeSource(sourceId);
+
+            map.addSource(sourceId, {
+                type: 'vector',
+                tiles: [tileUrl],
+                minzoom: 0,
+                maxzoom: 14
+            });
+
+            map.addLayer({
+                'id': layerId,
+                'type': 'fill',
+                'source': sourceId,
+                'source-layer': 'default', // DuckDB ST_AsMVT defaults to 'default' if not specified
+                'paint': {
+                    'fill-color': [
+                        'interpolate',
+                        ['linear'],
+                        ['get', 'locations'],
+                        0, 'rgba(255,255,255,0)', // Transparent for 0
+                        1, '#fee5d9',
+                        10, '#fcae91',
+                        50, '#fb6a4a',
+                        100, '#de2d26',
+                        500, '#a50f15'
+                    ],
+                    'fill-opacity': 0.7,
+                    'fill-outline-color': 'rgba(0,0,0,0.1)'
+                }
+            });
+        };
+
+        map.on('load', () => {
+            const select = document.getElementById('technology');
+            
+            // Initialize
+            updateLayer(select.value);
+
+            // Handle change
+            select.addEventListener('change', (e) => {
+                updateLayer(e.target.value);
+            });
+        });
+    </script>
+</body>
+</html>

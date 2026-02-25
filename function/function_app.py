@@ -24,37 +24,28 @@ def tiles(req: func.HttpRequest) -> func.HttpResponse:
         x = int(req.route_params.get('x'))
         y = int(req.route_params.get('y'))
     except:
-        return func.HttpResponse(
-            status_code=400
-        )
+        return func.HttpResponse(status_code=400)
     sql = """
-    select st_asmvt({
-            "locations": d.locations
-            ,"providers": d.providers
-            ,"geometry": st_asmvtgeom(d.geom,st_extent(e.geom))
-        }) mvt
-    from 'az://azduckmvtcontainer/data_*.parquet' d
-    join (
-        select st_tileenvelope(?,?,?) geom
-    ) e on st_intersects(e.geom,d.geom)=true
-    where d.technology=?;
+        select st_asmvt({
+                "locations": d.locations
+                ,"providers": d.providers
+                ,"geometry": st_asmvtgeom(d.geom,st_extent(e.geom))
+            },'default') mvt
+        from 'az://azduckmvtcontainer/data_*.parquet' d
+        join (
+            select st_tileenvelope(?,?,?) geom
+        ) e on st_intersects(e.geom,d.geom)=true
+        where d.technology=?;
     """
     try:
         result = dbcn.execute(sql, [z, x, y, technology]).fetchone()
         tile = result[0]
     except:
-        try:
-            print('result')
-            print(result)
-            print('tile')
-            print(tile)
-        except:
-            pass
-        return func.HttpResponse(
-            status_code=204
-        )
-    return func.HttpResponse(
-        mimetype="application/vnd.mapbox-vector-tile",
-        status_code=200,
-        body=tile
-    )
+        return func.HttpResponse(status_code=204)
+    return func.HttpResponse(status_code=200, body=tile, mimetype="application/vnd.mapbox-vector-tile")
+
+@app.route(route="demo")
+def demo(req: func.HttpRequest) -> func.HttpResponse:
+    with open('azduckmvt.html') as f:
+        html = f.read()
+    return func.HttpResponse(body=html, mimetype="text/html")
