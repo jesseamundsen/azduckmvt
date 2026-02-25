@@ -8,4 +8,6 @@ curl https://install.duckdb.org | sh
 echo "install spatial; load spatial; install h3 from community; load h3;" >> ~/.duckdbrc
 
 # use duckdb to make (geo)parquet files
-duckdb < script_etl.sql
+for tech in 10 40 50 60 61 70 71 72; do
+    sed "s/\^TECHNOLOGY\^/$tech/g" script.sql | duckdb
+done

@@ -19,7 +19,7 @@ mkdir -p "extensions/v1.4.4/linux_amd64"
 cd "extensions/v1.4.4/linux_amd64"
 curl -L http://extensions.duckdb.org/v1.4.4/linux_amd64/azure.duckdb_extension.gz | gunzip -c > azure.duckdb_extension
 curl -L http://extensions.duckdb.org/v1.4.4/linux_amd64/spatial.duckdb_extension.gz | gunzip -c > spatial.duckdb_extension
-
+cd ../../../
 
 
 # azure resources setup
@@ -59,7 +59,7 @@ az functionapp create \
     --resource-group azduckmvt \
     --flexconsumption-location eastus2\
     --runtime python \
-    --runtime-version 3.10 \
+    --runtime-version 3.12 \
     --functions-version 4 \
     --os-type Linux
 
