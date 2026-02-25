@@ -62,7 +62,8 @@
         const updateLayer = (technology) => {
             const sourceId = 'mvt-source';
             const layerId = 'mvt-layer';
-            const tileUrl = `http://localhost:7071/api/tiles/${technology}/{z}/{x}/{y}`;
+            //const tileUrl = `http://localhost:7071/api/tiles/${technology}/{z}/{x}/{y}`;
+            const tileUrl = `https://azduckmvtfunction.azurewebsites.net/api/tiles/${technology}/{z}/{x}/{y}`;
 
             // Remove existing layer and source if they exist
             if (map.getLayer(layerId)) map.removeLayer(layerId);

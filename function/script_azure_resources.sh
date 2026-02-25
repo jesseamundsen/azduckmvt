@@ -59,9 +59,11 @@ az functionapp create \
     --resource-group azduckmvt \
     --flexconsumption-location eastus2\
     --runtime python \
-    --runtime-version 3.12 \
+    --runtime-version 3.10 \
     --functions-version 4 \
     --os-type Linux
+
+az functionapp cors add --resource-group azduckmvt --name azduckmvtfunction --allowed-origins '*'
 
 az functionapp config appsettings set \
   --name azduckmvtfunction \
