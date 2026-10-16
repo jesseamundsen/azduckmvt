@@ -41,6 +41,11 @@ az storage container create \
   --account-name azduckmvtstorage \
   --auth-mode login
 
+az storage blob service-properties update \
+  --account-name azduckmvtstorage \
+  --static-website \
+  --index-document "index.html"
+
 export AZURE_STORAGE_CONNECTION_STRING=$(az storage account show-connection-string \
   --name azduckmvtstorage \
   --resource-group azduckmvt \
@@ -50,7 +55,8 @@ export AZURE_STORAGE_CONNECTION_STRING=$(az storage account show-connection-stri
 az storage azcopy blob upload \
   --account-name azduckmvtstorage \
   --container azduckmvtcontainer \
-  --source "../data/*.parquet" \
+  --source "../data/parquet/*" \
+  --recursive \
   --connection-string "${AZURE_STORAGE_CONNECTION_STRING}"
 
 az functionapp create \

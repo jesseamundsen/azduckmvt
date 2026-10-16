@@ -90,10 +90,10 @@
             return color;
         };
 
-        const updateLayer = (technology) => {
+        const updateLayer = (layer) => {
             const sourceId = 'mvt-source';
             const layerId = 'mvt-layer';
-            const tileUrl = `https://azduckmvtfunction.azurewebsites.net/api/tiles/${technology}/{z}/{x}/{y}`;
+            const tileUrl = `https://azduckmvtfunction.azurewebsites.net/api/tiles/${layer}/{z}/{x}/{y}`;
 
             // Remove existing layer and source if they exist
             if (map.getLayer(layerId)) map.removeLayer(layerId);

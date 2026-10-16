@@ -2,4 +2,7 @@ data/*.csv
 data/*.parquet
 data/*.zip
 data/*.qgz
+data/**/
+*.duckdb
+*.wal
 function/extensions/**
