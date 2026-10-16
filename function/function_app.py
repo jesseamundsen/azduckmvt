@@ -16,39 +16,40 @@ def connection():
     return cn
 dbcn = connection()
 
-@app.route(route="tiles/{technology}/{z}/{x}/{y}")
+@app.route(route="tiles/{layer}/{z}/{x}/{y}")
 def tiles(req: func.HttpRequest) -> func.HttpResponse:
     try:
-        technology = int(req.route_params.get('technology'))
+        layer = int(req.route_params.get('layer'))
         z = int(req.route_params.get('z'))
         x = int(req.route_params.get('x'))
         y = int(req.route_params.get('y'))
     except:
         return func.HttpResponse(status_code=400)
-    sql = """
-        select st_asmvt({
-                 "h3_res8_id": d.h3_res8_id
-                ,"technology": d.technology
-                ,"locations": d.locations
-                ,"providers": d.providers
-                ,"maxdown": d.maxdown
-                ,"geometry": st_asmvtgeom(d.geom,st_extent(e.geom))
-            },'default') mvt
-        from 'az://azduckmvtcontainer/data_*.parquet' d
-        join (
-            select st_tileenvelope(?,?,?) geom
-        ) e on st_intersects(e.geom,d.geom)=true
-        where d.technology=?;
+    sql = f"""
+        with e as (
+            select st_tileenvelope(13,2172,3129) geom
+        ), t as (
+            select st_xmin(geom) xmin
+                ,st_xmax(geom) xmax
+                ,st_ymin(geom) ymin
+                ,st_ymax(geom) ymax
+                ,geom
+            from e
+        )
+        select st_asmvt({{
+                    "geometry": st_asmvtgeom(d.geom,st_extent(t.geom))
+            }},'{layer}') mvt
+        from t,read_parquet('az://azduckmvtcontainer/{layer}',hive_partitioning=true) d
+        where d.countyfips in ('{countyfips}')
+            and d.xmin >= t.xmin
+            and d.xmax <= t.xmax
+            and d.ymin >= t.ymin
+            and d.ymax >= t.ymax;
     """
+    # ky z/x/y 13/2172/3129
     try:
-        result = dbcn.execute(sql, [z, x, y, technology]).fetchone()
+        result = dbcn.execute(sql, [z, x, y, countyfips]).fetchone()
         tile = result[0]
     except:
         return func.HttpResponse(status_code=204)
     return func.HttpResponse(status_code=200, body=tile, mimetype="application/vnd.mapbox-vector-tile")
-
-@app.route(route="demo")
-def demo(req: func.HttpRequest) -> func.HttpResponse:
-    with open('azduckmvt.html') as f:
-        html = f.read()
-    return func.HttpResponse(body=html, mimetype="text/html")

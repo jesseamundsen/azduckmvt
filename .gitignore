@@ -1,7 +1,6 @@
-data/*.csv
-data/*.parquet
-data/*.zip
-data/*.qgz
+*.csv
+*.parquet
+*.zip
 data/**/
 *.duckdb
 *.wal

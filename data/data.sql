@@ -137,6 +137,16 @@ join counties c on st_intersects(d.geom,c.geom);
 
 -- create geoparquet
 copy (
+    select countyfips
+        ,xmin
+        ,xmax
+        ,ymin
+        ,ymax
+        ,st_envelope(geom) geom
+    from counties
+) to '../function/index.parquet';
+
+copy (
     select *
         ,(row_number() over (partition by countyfips order by rnk) // 100000)+1 filenum
     from buildings
