@@ -46,8 +46,7 @@ def tiles(req: func.HttpRequest) -> func.HttpResponse:
         from (
             select d.* exclude (geom)
                 ,st_asmvtgeom(d.geom, st_extent(t.geom)) mvt
-            from t,
-                read_parquet('az://azduckmvtcontainer/{layer}',hive_partitioning=true) d
+            from t,read_parquet('az://azduckmvtcontainer/{layer}',hive_partitioning=true) d
             where d.countyfips in ({countyfips})
             and d.xmax >= t.xmin
             and d.xmin <= t.xmax
