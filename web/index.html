@@ -20,7 +20,8 @@
             font-family: sans-serif;
             z-index: 1;
         }
-        select { font-size: 14px; padding: 4px; }
+        .layer-selector { display: grid; gap: 6px; }
+        .layer-selector label { display: flex; align-items: center; gap: 6px; font-size: 14px; }
         .github-link {
             position: absolute; bottom: 10px; left: 10px; background: white; padding: 5px;
             border-radius: 4px; box-shadow: 0 0 0 2px rgba(0,0,0,0.1); font-family: sans-serif; z-index: 1; font-size: 12px;
@@ -30,12 +31,11 @@
 </head>
 <body>
     <div class="control-panel">
-        <label for="layer">Layer:</label>
-        <select id="layer">
-            <option value="tiger_2026_roads">tiger_2026_roads</option>
-            <option value="nad_2026_addresses">nad_2026_addresses</option>
-            <option value="overture_2026_buildings">overture_2026_buildings</option>
-        </select>
+        <div class="layer-selector" aria-label="Map layers">
+            <label><input type="checkbox" data-layer="tiger_2026_roads" checked> Roads</label>
+            <label><input type="checkbox" data-layer="overture_2026_buildings" checked> Buildings</label>
+            <label><input type="checkbox" data-layer="nad_2026_addresses" checked> Addresses</label>
+        </div>
     </div>
     <div class="github-link">
         <a href="https://github.com/jesseamundsen/azduckmvt/" target="_blank">View on GitHub</a>
@@ -48,19 +48,19 @@
             style: {
                 'version': 8,
                 'sources': {
-                    'osm': {
+                    'google-hybrid': {
                         'type': 'raster',
-                        'tiles': ['https://a.tile.openstreetmap.org/{z}/{x}/{y}.png'],
+                        'tiles': ['https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}'],
                         'tileSize': 256,
-                        'attribution': '&copy; OpenStreetMap Contributors',
+                        'attribution': '&copy; Google',
                         'maxzoom': 19
                     }
                 },
                 'layers': [
                     {
-                        'id': 'osm',
+                        'id': 'google-hybrid',
                         'type': 'raster',
-                        'source': 'osm'
+                        'source': 'google-hybrid'
                     }
                 ]
             },
@@ -68,14 +68,34 @@
             zoom: 10
         });
 
-        const updateLayer = (layer) => {
-            const sourceId = 'mvt-source';
-            const layerId = 'mvt-layer';
-            const tileUrl = `https://azduckmvtfunction.azurewebsites.net/api/tiles/${layer}/{z}/{x}/{y}`;
+        const layerStyles = {
+            tiger_2026_roads: {
+                type: 'line',
+                paint: { 'line-color': '#e63946', 'line-width': 2 }
+            },
+            overture_2026_buildings: {
+                type: 'fill',
+                paint: {
+                    'fill-color': '#f4a261',
+                    'fill-opacity': 0.55,
+                    'fill-outline-color': '#b85c38'
+                }
+            },
+            nad_2026_addresses: {
+                type: 'circle',
+                paint: {
+                    'circle-radius': 4,
+                    'circle-color': '#1565c0',
+                    'circle-stroke-color': '#ffffff',
+                    'circle-stroke-width': 1
+                }
+            }
+        };
 
-            // Remove existing layer and source if they exist
-            if (map.getLayer(layerId)) map.removeLayer(layerId);
-            if (map.getSource(sourceId)) map.removeSource(sourceId);
+        const addLayer = (layer) => {
+            const sourceId = `${layer}-source`;
+            const layerId = `${layer}-layer`;
+            const tileUrl = `https://azduckmvtfunction.azurewebsites.net/api/tiles/${layer}/{z}/{x}/{y}`;
 
             map.addSource(sourceId, {
                 type: 'vector',
@@ -86,35 +106,15 @@
 
             map.addLayer({
                 'id': layerId,
-                'type': {
-                    tiger_2026_roads: 'line',
-                    nad_2026_addresses: 'circle',
-                    overture_2026_buildings: 'fill'
-                }[layer],
+                'type': layerStyles[layer].type,
                 'source': sourceId,
                 'source-layer': layer,
-                'paint': {
-                    tiger_2026_roads: {
-                        'line-color': '#e63946',
-                        'line-width': 2
-                    },
-                    nad_2026_addresses: {
-                        'circle-radius': 4,
-                        'circle-color': '#1565c0',
-                        'circle-stroke-color': '#ffffff',
-                        'circle-stroke-width': 1
-                    },
-                    overture_2026_buildings: {
-                        'fill-color': '#f4a261',
-                        'fill-opacity': 0.55,
-                        'fill-outline-color': '#b85c38'
-                    }
-                }[layer]
+                'paint': layerStyles[layer].paint
             });
         };
 
         map.on('load', () => {
-            map.on('click', 'mvt-layer', (e) => {
+            const showPopup = (e) => {
                 const props = e.features[0].properties;
                 let content = '<div style="font-family: sans-serif; font-size: 12px;">';
                 for (const key in props) {
@@ -126,24 +126,26 @@
                     .setLngLat(e.lngLat)
                     .setHTML(content)
                     .addTo(map);
+            };
+
+            // Add from bottom to top: roads, buildings, then addresses.
+            Object.keys(layerStyles).forEach((layer) => {
+                addLayer(layer);
+                const layerId = `${layer}-layer`;
+                map.on('click', layerId, showPopup);
+                map.on('mouseenter', layerId, () => {
+                    map.getCanvas().style.cursor = 'pointer';
+                });
+                map.on('mouseleave', layerId, () => {
+                    map.getCanvas().style.cursor = '';
+                });
             });
 
-            map.on('mouseenter', 'mvt-layer', () => {
-                map.getCanvas().style.cursor = 'pointer';
-            });
-
-            map.on('mouseleave', 'mvt-layer', () => {
-                map.getCanvas().style.cursor = '';
-            });
-
-            const select = document.getElementById('layer');
-            
-            // Initialize
-            updateLayer(select.value);
-
-            // Handle change
-            select.addEventListener('change', (e) => {
-                updateLayer(e.target.value);
+            document.querySelectorAll('[data-layer]').forEach((input) => {
+                input.addEventListener('change', (e) => {
+                    const layerId = `${e.target.dataset.layer}-layer`;
+                    map.setLayoutProperty(layerId, 'visibility', e.target.checked ? 'visible' : 'none');
+                });
             });
         });
     </script>
