@@ -32,9 +32,9 @@
 <body>
     <div class="control-panel">
         <div class="layer-selector" aria-label="Map layers">
-            <label><input type="checkbox" data-layer="tiger_2026_roads" checked> Roads</label>
-            <label><input type="checkbox" data-layer="overture_2026_buildings" checked> Buildings</label>
             <label><input type="checkbox" data-layer="nad_2026_addresses" checked> Addresses</label>
+            <label><input type="checkbox" data-layer="overture_2026_buildings" checked> Buildings</label>
+            <label><input type="checkbox" data-layer="tiger_2026_roads" checked> Roads</label>
         </div>
     </div>
     <div class="github-link">
@@ -71,7 +71,7 @@
         const layerStyles = {
             tiger_2026_roads: {
                 type: 'line',
-                paint: { 'line-color': '#e63946', 'line-width': 2 }
+                paint: { 'line-color': '#e63946', 'line-width': 2, 'line-opacity': 0.6 }
             },
             overture_2026_buildings: {
                 type: 'fill',
