@@ -42,15 +42,18 @@ def tiles(req: func.HttpRequest) -> func.HttpResponse:
                 ,geom
             from e
         )
-        select st_asmvt({{
-                    "geometry": st_asmvtgeom(d.geom,st_extent(t.geom))
-            }},'{layer}') mvt
-        from t,read_parquet('az://azduckmvtcontainer/{layer}',hive_partitioning=true) d
-        where d.countyfips in ({countyfips})
+        select st_asmvt(f, '{layer}', 4096, 'mvt') mvt
+        from (
+            select d.* exclude (geom)
+                ,st_asmvtgeom(d.geom, st_extent(t.geom)) mvt
+            from t,
+                read_parquet('az://azduckmvtcontainer/{layer}',hive_partitioning=true) d
+            where d.countyfips in ({countyfips})
             and d.xmax >= t.xmin
             and d.xmin <= t.xmax
             and d.ymax >= t.ymin
-            and d.ymin <= t.ymax;
+            and d.ymin <= t.ymax
+        ) f;
     """
     # ky z/x/y 13/2172/3129
     try:
