@@ -5,8 +5,9 @@ This project shows how to build a serverless tile API by using DuckDB, GeoParque
 **Folders**
 * `data` is used for ETL to prepare data.
 * `function` contains the Azure Function code as well as a mini demo client.
-  * The function will deliver the mini demo client when called at `/api/demo`.
+* `web` contains the demo single page application that accesses the function for tile display.
 
 **Scripts**
-* `data/script.sh` will act upon downloaded zip files from the [Broadband Map](https://broadbandmap.fcc.gov/data-download/) to create GeoParquet files.
-* `function/script.sh` shows how to setup and deploy resources to Azure.
+* `data/data.sql` contains the ETL steps and sbusequent building of GeoParquet files.
+* `function/script.sh` shows how to setup and deploy resources to Azure as well as publishing the GeoParquet data to Azure Storage.
+* `web/publish.sh` to publish the single page app to the static web storage and view the delivery URL.
