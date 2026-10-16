@@ -43,6 +43,7 @@ az storage container create \
   --account-name azduckmvtstorage \
   --auth-mode login
 
+# for static web hosting the demo page later
 az storage blob service-properties update \
   --account-name azduckmvtstorage \
   --static-website \
@@ -59,7 +60,6 @@ az storage blob delete-batch \
   --pattern "*" \
   --account-name azduckmvtstorage \
   --connection-string "${AZURE_STORAGE_CONNECTION_STRING}"
-
 
 az storage azcopy blob upload \
   --account-name azduckmvtstorage \
