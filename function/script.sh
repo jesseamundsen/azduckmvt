@@ -54,6 +54,13 @@ export AZURE_STORAGE_CONNECTION_STRING=$(az storage account show-connection-stri
   --query connectionString \
   --output tsv)
 
+az storage blob delete-batch \
+  --source azduckmvtcontainer \
+  --pattern "*" \
+  --account-name azduckmvtstorage \
+  --connection-string "${AZURE_STORAGE_CONNECTION_STRING}"
+
+
 az storage azcopy blob upload \
   --account-name azduckmvtstorage \
   --container azduckmvtcontainer \

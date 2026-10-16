@@ -54,14 +54,14 @@ drop table if exists roads;
 create table roads as
 with d as (
     select right(left(".filename",30),5) countyfips
-        ,*
+        ,* exclude (geometry)
         ,st_transform(st_setcrs(st_geomfromwkb(geometry),'EPSG:4269'),'EPSG:3857',always_xy:=true) geom 
     from st_read_multi('tiger_2026_roads/*.shp')
 ), e as (
     select st_extent(st_extent_agg(geom)) extent
     from d
 )
-select *
+select d.*
     ,st_xmin(geom) xmin
     ,st_xmax(geom) xmax
     ,st_ymin(geom) ymin
@@ -82,7 +82,7 @@ unzip '*.zip'
 drop table if exists addresses;
 create table addresses as
 with d as (
-    select *
+    select a.* exclude (DateUpdate)
         ,st_transform(st_setcrs(st_point(longitude,latitude),'EPSG:4326'),'EPSG:3857',always_xy:=true) geom
     from read_csv('nad_2026_addresses/NAD_r24.txt', types={'Floor': 'VARCHAR'}) a 
     where a.State='KY'
@@ -135,7 +135,10 @@ join counties c on st_intersects(d.geom,c.geom);
 
 
 
--- create geoparquet
+/*
+rm -rf parquet
+mkdir parquet
+*/
 copy (
     select countyfips
         ,xmin
