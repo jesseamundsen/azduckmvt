@@ -8,9 +8,10 @@
 
 
 # initial function setup
-# func init . --worker-runtime python
-# python3 -m venv .venv
-# pip install -r requirements.txt
+func init . --worker-runtime python
+python3.12 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
 
 
 
@@ -20,6 +21,7 @@ cd "extensions/v1.5.6/linux_amd64"
 curl -L http://extensions.duckdb.org/v1.5.6/linux_amd64/azure.duckdb_extension.gz | gunzip -c > azure.duckdb_extension
 curl -L http://extensions.duckdb.org/v1.5.6/linux_amd64/spatial.duckdb_extension.gz | gunzip -c > spatial.duckdb_extension
 cd ../../../
+
 
 
 # azure resources setup

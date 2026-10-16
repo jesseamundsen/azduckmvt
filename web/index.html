@@ -21,13 +21,6 @@
             z-index: 1;
         }
         select { font-size: 14px; padding: 4px; }
-        .legend {
-            position: absolute; bottom: 30px; right: 10px; background: white; padding: 10px;
-            border-radius: 4px; box-shadow: 0 0 0 2px rgba(0,0,0,0.1); font-family: sans-serif; z-index: 1;
-        }
-        .legend h4 { margin: 0 0 5px; font-size: 14px; }
-        .legend div { display: flex; align-items: center; margin-bottom: 2px; font-size: 12px; }
-        .legend span { display: inline-block; width: 20px; height: 20px; margin-right: 5px; border: 1px solid #ccc; }
         .github-link {
             position: absolute; bottom: 10px; left: 10px; background: white; padding: 5px;
             border-radius: 4px; box-shadow: 0 0 0 2px rgba(0,0,0,0.1); font-family: sans-serif; z-index: 1; font-size: 12px;
@@ -37,19 +30,13 @@
 </head>
 <body>
     <div class="control-panel">
-        <label for="technology">Technology:</label>
-        <select id="technology">
-            <option value="10">Copper Wire</option>
-            <option value="40">Coaxial Cable</option>
-            <option value="50">Optical Carrier/Fiber</option>
-            <option value="60">Geostationary Satellite</option>
-            <option value="61">Non-geostationary Satellite</option>
-            <option value="70">Unlicensed Fixed Wireless</option>
-            <option value="71">Licensed Fixed Wireless</option>
-            <option value="72">Licensed-by-Rule Fixed Wireless</option>
+        <label for="layer">Layer:</label>
+        <select id="layer">
+            <option value="tiger_2026_roads">tiger_2026_roads</option>
+            <option value="nad_2026_addresses">nad_2026_addresses</option>
+            <option value="overture_2026_buildings">overture_2026_buildings</option>
         </select>
     </div>
-    <div id="legend" class="legend"></div>
     <div class="github-link">
         <a href="https://github.com/jesseamundsen/azduckmvt/" target="_blank">View on GitHub</a>
     </div>
@@ -77,18 +64,9 @@
                     }
                 ]
             },
-            center: [-98.5795, 39.8283], // Center of USA
-            zoom: 4
+            center: [-84.51878883201181, 38.03498836733132], // Center of KY
+            zoom: 10
         });
-
-        const getRandomColor = () => {
-            const letters = '0123456789ABCDEF';
-            let color = '#';
-            for (let i = 0; i < 6; i++) {
-                color += letters[Math.floor(Math.random() * 16)];
-            }
-            return color;
-        };
 
         const updateLayer = (layer) => {
             const sourceId = 'mvt-source';
@@ -99,27 +77,10 @@
             if (map.getLayer(layerId)) map.removeLayer(layerId);
             if (map.getSource(sourceId)) map.removeSource(sourceId);
 
-            const stops = [1, 10, 50, 100, 500];
-            const colors = stops.map(() => getRandomColor());
-
-            const randomRamp = [
-                'interpolate',
-                ['linear'],
-                ['get', 'locations'],
-                0, 'rgba(255,255,255,0)'
-            ];
-
-            let legendHtml = `<h4>Legend</h4>`;
-            stops.forEach((stop, i) => {
-                randomRamp.push(stop, colors[i]);
-                legendHtml += `<div><span style="background-color: ${colors[i]}"></span>${stop} Locations</div>`;
-            });
-            document.getElementById('legend').innerHTML = legendHtml;
-
             map.addSource(sourceId, {
                 type: 'vector',
                 tiles: [tileUrl],
-                minzoom: 0,
+                minzoom: 10,
                 maxzoom: 14
             });
 
@@ -127,12 +88,7 @@
                 'id': layerId,
                 'type': 'fill',
                 'source': sourceId,
-                'source-layer': 'default',
-                'paint': {
-                    'fill-color': randomRamp,
-                    'fill-opacity': 0.7,
-                    'fill-outline-color': 'rgba(0,0,0,0.1)'
-                }
+                'source-layer': layer
             });
         };
 
@@ -159,7 +115,7 @@
                 map.getCanvas().style.cursor = '';
             });
 
-            const select = document.getElementById('technology');
+            const select = document.getElementById('layer');
             
             // Initialize
             updateLayer(select.value);

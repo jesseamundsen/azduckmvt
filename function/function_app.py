@@ -23,6 +23,8 @@ def tiles(req: func.HttpRequest) -> func.HttpResponse:
         z = int(req.route_params.get('z'))
         x = int(req.route_params.get('x'))
         y = int(req.route_params.get('y'))
+        if z < 10:
+            raise
     except:
         return func.HttpResponse(status_code=400)
 
