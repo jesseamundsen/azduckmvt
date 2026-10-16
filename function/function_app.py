@@ -47,10 +47,10 @@ def tiles(req: func.HttpRequest) -> func.HttpResponse:
             }},'{layer}') mvt
         from t,read_parquet('az://azduckmvtcontainer/{layer}',hive_partitioning=true) d
         where d.countyfips in ({countyfips})
-            and d.xmin >= t.xmin
-            and d.xmax <= t.xmax
-            and d.ymin >= t.ymin
-            and d.ymax >= t.ymax;
+            and d.xmax >= t.xmin
+            and d.xmin <= t.xmax
+            and d.ymax >= t.ymin
+            and d.ymin <= t.ymax;
     """
     # ky z/x/y 13/2172/3129
     try:

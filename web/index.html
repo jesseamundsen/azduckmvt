@@ -86,9 +86,30 @@
 
             map.addLayer({
                 'id': layerId,
-                'type': 'fill',
+                'type': {
+                    tiger_2026_roads: 'line',
+                    nad_2026_addresses: 'circle',
+                    overture_2026_buildings: 'fill'
+                }[layer],
                 'source': sourceId,
-                'source-layer': layer
+                'source-layer': layer,
+                'paint': {
+                    tiger_2026_roads: {
+                        'line-color': '#e63946',
+                        'line-width': 2
+                    },
+                    nad_2026_addresses: {
+                        'circle-radius': 4,
+                        'circle-color': '#1565c0',
+                        'circle-stroke-color': '#ffffff',
+                        'circle-stroke-width': 1
+                    },
+                    overture_2026_buildings: {
+                        'fill-color': '#f4a261',
+                        'fill-opacity': 0.55,
+                        'fill-outline-color': '#b85c38'
+                    }
+                }[layer]
             });
         };
 
