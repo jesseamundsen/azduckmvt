@@ -15,10 +15,10 @@
 
 
 # install extensions locally
-mkdir -p "extensions/v1.4.4/linux_amd64"
-cd "extensions/v1.4.4/linux_amd64"
-curl -L http://extensions.duckdb.org/v1.4.4/linux_amd64/azure.duckdb_extension.gz | gunzip -c > azure.duckdb_extension
-curl -L http://extensions.duckdb.org/v1.4.4/linux_amd64/spatial.duckdb_extension.gz | gunzip -c > spatial.duckdb_extension
+mkdir -p "extensions/v1.5.6/linux_amd64"
+cd "extensions/v1.5.6/linux_amd64"
+curl -L http://extensions.duckdb.org/v1.5.6/linux_amd64/azure.duckdb_extension.gz | gunzip -c > azure.duckdb_extension
+curl -L http://extensions.duckdb.org/v1.5.6/linux_amd64/spatial.duckdb_extension.gz | gunzip -c > spatial.duckdb_extension
 cd ../../../
 
 

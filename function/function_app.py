@@ -19,15 +19,19 @@ dbcn = connection()
 @app.route(route="tiles/{layer}/{z}/{x}/{y}")
 def tiles(req: func.HttpRequest) -> func.HttpResponse:
     try:
-        layer = int(req.route_params.get('layer'))
+        layer = str(req.route_params.get('layer'))
         z = int(req.route_params.get('z'))
         x = int(req.route_params.get('x'))
         y = int(req.route_params.get('y'))
     except:
         return func.HttpResponse(status_code=400)
+
+    sql = f"select string_agg(''''||countyfips||'''',',') from 'index.parquet' where st_intersects(geom,st_tileenvelope({z},{x},{y}))"
+    countyfips = dbcn.execute(sql).fetchone()[0]
+    
     sql = f"""
         with e as (
-            select st_tileenvelope(13,2172,3129) geom
+            select st_tileenvelope({z},{x},{y}) geom
         ), t as (
             select st_xmin(geom) xmin
                 ,st_xmax(geom) xmax
@@ -40,7 +44,7 @@ def tiles(req: func.HttpRequest) -> func.HttpResponse:
                     "geometry": st_asmvtgeom(d.geom,st_extent(t.geom))
             }},'{layer}') mvt
         from t,read_parquet('az://azduckmvtcontainer/{layer}',hive_partitioning=true) d
-        where d.countyfips in ('{countyfips}')
+        where d.countyfips in ({countyfips})
             and d.xmin >= t.xmin
             and d.xmax <= t.xmax
             and d.ymin >= t.ymin
@@ -48,8 +52,9 @@ def tiles(req: func.HttpRequest) -> func.HttpResponse:
     """
     # ky z/x/y 13/2172/3129
     try:
-        result = dbcn.execute(sql, [z, x, y, countyfips]).fetchone()
+        result = dbcn.execute(sql).fetchone()
         tile = result[0]
     except:
+        logging.error('error', exc_info=True)
         return func.HttpResponse(status_code=204)
     return func.HttpResponse(status_code=200, body=tile, mimetype="application/vnd.mapbox-vector-tile")

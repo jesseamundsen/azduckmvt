@@ -3,4 +3,4 @@
 # azure-monitor-opentelemetry 
 
 azure-functions
-duckdb
+duckdb==1.5.6
