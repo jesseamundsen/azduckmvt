@@ -1,4 +1,4 @@
--- use duckdb for etl
+-- use duckdb for etl: https://duckdb.org 
 /*
 cd data
 rm data.duckdb
@@ -31,7 +31,7 @@ with d as (
     select GEOID countyfips
         ,st_transform(st_setcrs(geom,'EPSG:4269'),'EPSG:3857',always_xy:=true) geom
     from st_read('tiger_2026_counties/tl_2026_us_county.shp')
-    where statefp='21'
+    where statefp='39'
 )
 select countyfips
     ,st_xmin(geom) xmin
@@ -47,7 +47,7 @@ from d;
 rm -rf tiger_2026_roads
 mkdir tiger_2026_roads
 cd tiger_2026_roads
-lftp -u anonymous:anonymous -e "mget /geo/tiger/TIGER2026/ROADS/tl_2026_21*; quit;" ftp.census.gov
+lftp -u anonymous:anonymous -e "mget /geo/tiger/TIGER2026/ROADS/tl_2026_39*; quit;" ftp.census.gov
 unzip '*.zip'
 */
 drop table if exists roads;
@@ -75,8 +75,7 @@ from d,e;
 rm -rf nad_2026_addresses
 mkdir nad_2026_addresses
 cd nad_2026_addresses
-curl -L -o nad_2026_addresses.zip "https://data.transportation.gov/download/fc2s-wawr/application%2Fx-z
-ip-compressed"
+curl -L -o nad_2026_addresses.zip "https://data.transportation.gov/download/fc2s-wawr/application%2Fx-zip-compressed"
 unzip '*.zip'
 */
 drop table if exists addresses;
@@ -85,7 +84,7 @@ with d as (
     select a.* exclude (DateUpdate)
         ,st_transform(st_setcrs(st_point(longitude,latitude),'EPSG:4326'),'EPSG:3857',always_xy:=true) geom
     from read_csv('nad_2026_addresses/NAD_r24.txt', types={'Floor': 'VARCHAR'}) a 
-    where a.State='KY'
+    where a.State='OH'
 ), e as (
     select st_extent(st_extent_agg(geom)) extent
     from d
