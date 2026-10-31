@@ -31,7 +31,7 @@ with d as (
     select GEOID countyfips
         ,st_transform(st_setcrs(geom,'EPSG:4269'),'EPSG:3857',always_xy:=true) geom
     from st_read('tiger_2026_counties/tl_2026_us_county.shp')
-    where statefp='39'
+    where statefp in ('39')
 )
 select countyfips
     ,st_xmin(geom) xmin
@@ -149,7 +149,7 @@ copy (
 ) to '../function/index.parquet';
 
 copy (
-    select *
+    select id,geom::geometry('OGC:CRS84') geom,countyfips,xmax,xmin,ymax,ymin
         ,(row_number() over (partition by countyfips order by rnk) // 100000)+1 filenum
     from buildings
 )

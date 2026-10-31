@@ -46,7 +46,7 @@ def tiles(req: func.HttpRequest) -> func.HttpResponse:
         from (
             select d.* exclude (geom)
                 ,st_asmvtgeom(d.geom, st_extent(t.geom)) mvt
-            from t,read_parquet('az://azduckmvtcontainer/{layer}',hive_partitioning=true) d
+            from t,read_parquet('az://azduckmvtcontainer/{layer}',hive_partitioning=true,union_by_name=true) d
             where d.countyfips in ({countyfips})
             and d.xmax >= t.xmin
             and d.xmin <= t.xmax
@@ -56,6 +56,7 @@ def tiles(req: func.HttpRequest) -> func.HttpResponse:
     """
     # ky z/x/y 13/2172/3129
     try:
+        logging.info(sql)
         result = dbcn.execute(sql).fetchone()
         tile = result[0]
     except:
