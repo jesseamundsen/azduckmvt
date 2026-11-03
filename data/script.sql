@@ -148,6 +148,7 @@ copy (
     from counties
 ) to '../function/index.parquet';
 
+-- this srid/crs is wrong but it matches the other wrong things...
 copy (
     select id,geom::geometry('OGC:CRS84') geom,countyfips,xmax,xmin,ymax,ymin
         ,(row_number() over (partition by countyfips order by rnk) // 100000)+1 filenum
