@@ -52,10 +52,10 @@ def tiles(req: func.HttpRequest) -> func.HttpResponse:
                 ,st_asmvtgeom(d.geom, st_extent(t.geom)) mvt
             from t,read_parquet('az://azduckmvtcontainer/{layer}',hive_partitioning=true,union_by_name=true) d
             where d.countyfips in ({countyfips})
-            and d.xmax >= t.xmin
-            and d.xmin <= t.xmax
-            and d.ymax >= t.ymin
-            and d.ymin <= t.ymax
+                and d.xmax >= t.xmin
+                and d.xmin <= t.xmax
+                and d.ymax >= t.ymin
+                and d.ymin <= t.ymax
         ) f;
     """
 
