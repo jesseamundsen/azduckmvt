@@ -58,7 +58,7 @@ def tiles(req: func.HttpRequest) -> func.HttpResponse:
             and d.ymin <= t.ymax
         ) f;
     """
-    # ky z/x/y 13/2172/3129
+
     try:
         logging.info(sql)
         result = dbcn.execute(sql).fetchone()
