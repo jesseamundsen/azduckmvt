@@ -44,7 +44,11 @@ def tiles(req: func.HttpRequest) -> func.HttpResponse:
         )
         select st_asmvt(f, '{layer}', 4096, 'mvt') mvt
         from (
-            select d.* exclude (geom)
+            select d.countyfips
+                ,d.xmin
+                ,d.xmax
+                ,d.ymin
+                ,d.ymax
                 ,st_asmvtgeom(d.geom, st_extent(t.geom)) mvt
             from t,read_parquet('az://azduckmvtcontainer/{layer}',hive_partitioning=true,union_by_name=true) d
             where d.countyfips in ({countyfips})
