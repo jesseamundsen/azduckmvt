@@ -1,6 +1,16 @@
 # azduckmvt
 
-This project shows how to build a serverless tile API by using DuckDB, GeoParquet, and Azure Storage + Functions.
+This project shows how to build a serverless tile API by using DuckDB, GeoParquet, and Azure Storage + Functions. 
+It also serves as the repository for the presentation and talk.
+
+**Slides**
+* [slides.pdf](slides.pdf)
+
+**Contact**
+* jesse.amundsen@gmail.com
+* https://github.com/jesseamundsen
+* https://jesseamundsen.github.io
+* https://www.linkedin.com/in/jesseamundsen
 
 **Folders**
 * `data` is used for ETL to prepare data.
